@@ -1,3 +1,5 @@
+TIME_ZONE = 'Asia/Yekaterinburg'
+
 VEHICLES = [
     'Автокран 25тн',
     'Автокран LIEBHERR',

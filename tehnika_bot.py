@@ -41,21 +41,6 @@ async def start_handler(message: types.Message):
     await message.answer(text=INITIAL_TEXT)
 
 
-
-@dp.message_handler(commands=['help'])
-async def help_handler(message: types.Message):
-    await bot.send_message(
-        message.chat.id,
-        text=f'{message.from_user.full_name}{HELP_TEXT}'
-    )
-    await bot.send_message(message.chat.id, text=FINAL_TEXT)
-
-
-@dp.message_handler(commands=['menu'])
-async def all_commands(message: types.Message):
-    await bot.send_message(message.chat.id, text=FINAL_TEXT)
-
-
 @dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
 async def delete_service_message(message: types.Message):
     await bot.delete_message(message.chat.id, message.message_id)
@@ -74,6 +59,4 @@ if __name__ == '__main__':
     scheduler.start()
     register_handlers_service(dp)
     register_handlers_vehicle(dp)
-    register_handlers_quiz(dp)
-    register_handlers_labor_safety(dp)
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

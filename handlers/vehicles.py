@@ -37,10 +37,11 @@ async def help_vehicle_message(message: types.Message):
             'Для создания заявки на технику нажмите /tehnika\n'
             'Для удаления введённой заявки на технику нажмите /tehnika_del\n'
             'Для просмотра списка заявок нажмите /report\n'
-            'Для сброса текущего диалога и настроек клавиатуры нажмите /reset\n'
             'Для согласования техники нажмите /confirm\n'
             'Для просмотра согласованной техники нажмите /resume\n'
-            'Для отправки отзыва о работе бота или пожеланий нажмите /offer'
+            'Для отправки отзыва о работе бота или пожеланий нажмите /offer\n'
+            'Для сброса текущего диалога и настроек клавиатуры нажмите /reset\n'
+            'Для получения информации по доступным командам нажмите /help'
         )
     )
 
@@ -333,6 +334,21 @@ async def confirm_order(message: types.Message, state: FSMContext):
             }
         }
     )
+    order = vehicles.find_one(
+        {
+            'date': date,
+            'vehicle': vehicle,
+            'location': location,
+            'time': time,
+        }
+    )
+    user_id = order.get('user_id')
+    order_confirm = order.get('confirm_comment')
+    await bot.send_message(
+        chat_id=user_id,
+        text=('Ваша заявка на технику обработана:\n'
+              f'{location}\n{vehicle}\n{order_confirm}')
+    )
     await message.answer(
         ('Отлично! Данные успешно сохранены.\n'
          'Если необходимо продолжить работу с заявками нажмите /confirm\n\n'
@@ -423,7 +439,7 @@ async def vehicle_delete_done(message: types.Message, state: FSMContext):
 
 
 def register_handlers_vehicle(dp: Dispatcher):
-    dp.register_message_handler(help_vehicle_message, commands='help_gks')
+    dp.register_message_handler(help_vehicle_message, commands='help')
     dp.register_message_handler(vehicle_start, commands='tehnika')
     dp.register_message_handler(send_vehicle_report, commands='report')
     dp.register_message_handler(send_vehicle_confirm_resume, commands='resume')

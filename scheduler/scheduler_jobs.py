@@ -1,7 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import utils.constants as const
-from handlers.quiz import send_quiz_shedule
 from scheduler.scheduler_func import (send_vehicle_month_resume,
                                       send_vehicle_notify)
 

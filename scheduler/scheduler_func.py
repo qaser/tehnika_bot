@@ -1,12 +1,10 @@
 import datetime as dt
 import math
 
-from aiogram import types
-
 import utils.constants as const
 from config.bot_config import bot
 from config.mongo_config import vehicles
-from config.telegram_config import CHAT_ID, CHAT_ID_GKS
+from config.telegram_config import CHAT_ID_GKS
 from functions.word_conjugate import word_conjugate
 
 

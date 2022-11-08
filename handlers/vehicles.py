@@ -224,6 +224,7 @@ async def confirmation(message: types.Message, state: FSMContext):
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.reset_state()
+        await state.finish()
     user_data = await state.get_data()
     date = dt.datetime.today().strftime('%d.%m.%Y')
     vehicles.insert_one(

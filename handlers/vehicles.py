@@ -217,7 +217,29 @@ async def confirmation(message: types.Message, state: FSMContext):
             'Пожалуйста, выберите ответ, используя клавиатуру ниже.'
         )
         return
-    if message.text.lower() == 'нет':
+    if message.text.lower() == 'да':
+        user_data = await state.get_data()
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        vehicles.insert_one(
+            {
+                'date': date,
+                'user': message.from_user.full_name,
+                'user_id': message.from_user.id,
+                'location': user_data['chosen_location'],
+                'vehicle': user_data['chosen_vehicle'],
+                'time': user_data['chosen_vehicle_time'],
+                'comment': user_data['comment'],
+                'confirm': False,
+                'confirm_comment': '',
+            }
+        )
+        await message.answer(
+            ('Отлично! Данные успешно сохранены.\n'
+            'Если необходимо выбрать ещё технику нажмите /tehnika'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.finish()
+    else:
         await message.answer(
             ('Хорошо. Данные не сохранены.\n'
              'Если необходимо выбрать технику снова - нажмите /tehnika'),
@@ -225,27 +247,6 @@ async def confirmation(message: types.Message, state: FSMContext):
         )
         await state.reset_state()
         await state.finish()
-    user_data = await state.get_data()
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    vehicles.insert_one(
-        {
-            'date': date,
-            'user': message.from_user.full_name,
-            'user_id': message.from_user.id,
-            'location': user_data['chosen_location'],
-            'vehicle': user_data['chosen_vehicle'],
-            'time': user_data['chosen_vehicle_time'],
-            'comment': user_data['comment'],
-            'confirm': False,
-            'confirm_comment': '',
-        }
-    )
-    await message.answer(
-        ('Отлично! Данные успешно сохранены.\n'
-         'Если необходимо выбрать ещё технику нажмите /tehnika'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
 
 
 async def start_confirm_vehicle_orders(message: types.Message):

@@ -12,7 +12,7 @@ from scheduler.scheduler_jobs import scheduler, scheduler_jobs
 from texts.initial import INITIAL_TEXT
 
 logging.basicConfig(
-    filename='tehnika_bot.log',
+    filename='logs_bot.log',
     level=logging.INFO,
     filemode='a',
     format='%(asctime)s - %(message)s',

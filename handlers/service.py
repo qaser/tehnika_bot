@@ -74,34 +74,35 @@ async def confirm_offer(message: types.Message, state: FSMContext):
             'Пожалуйста, отправьте "Да" или "Нет"'
         )
         return
-    if message.text.lower() == 'нет':
+    if message.text.lower() == 'да':
+        buffer_data = await state.get_data()
+        offer = buffer_data['offer']
+        user = message.from_user
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        offers.insert_one(
+            {
+                'date': date,
+                'user_id': user.id,
+                'offer': offer,
+            }
+        )
+        await message.answer(
+            ('Отлично! Сообщение отправлено.\n'
+            'Спасибо за отзыв!'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.finish()
+        await bot.send_message(
+            chat_id=MY_TELEGRAM_ID,
+            text=f'Получен новый отзыв от {user.full_name}:\n{offer}'
+        )
+    else:
         await message.answer(
             ('Хорошо. Отзыв не сохранен.\n'
              'Если необходимо отправить новый отзыв - нажмите /offer'),
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.reset_state()
-    buffer_data = await state.get_data()
-    offer = buffer_data['offer']
-    user = message.from_user
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    offers.insert_one(
-        {
-            'date': date,
-            'user_id': user.id,
-            'offer': offer,
-        }
-    )
-    await message.answer(
-        ('Отлично! Сообщение отправлено.\n'
-         'Спасибо за отзыв!'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
-    await bot.send_message(
-        chat_id=MY_TELEGRAM_ID,
-        text=f'Получен новый отзыв от {user.full_name}:\n{offer}'
-    )
 
 
 def register_handlers_service(dp: Dispatcher):

@@ -13,8 +13,8 @@ def scheduler_jobs():
         send_vehicle_notify,
         'cron',
         day_of_week='mon-thu',
-        hour=16,
-        minute=0,
+        hour=9,
+        minute=25,
         timezone=const.TIME_ZONE
     )
     # напоминание о заказе техники в "пятницу"

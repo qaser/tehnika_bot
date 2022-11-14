@@ -4,7 +4,7 @@ import math
 import utils.constants as const
 from config.bot_config import bot
 from config.mongo_config import vehicles
-from config.telegram_config import CHAT_ID_GKS
+from config.telegram_config import CHAT_ID_GKS, MY_TELEGRAM_ID
 from functions.word_conjugate import word_conjugate
 
 
@@ -26,7 +26,7 @@ async def send_vehicle_notify():
     else:
         final_text = ''
     message = '{}\n{}\n{}'.format(text_prefix, final_text, text_suffix)
-    await bot.send_message(chat_id=CHAT_ID_GKS, text=message)
+    await bot.send_message(chat_id=MY_TELEGRAM_ID, text=message)
 
 
 # функция формирования и отправки статистики по технике

@@ -115,10 +115,10 @@ async def send_logs(message: types.Message):
 
 # обработка команды /check
 async def bot_check(message: types.Message):
-    if message.chat.id == MY_TELEGRAM_ID:
+    if message.from_user.id == MY_TELEGRAM_ID:
         await message.answer('Проверка прошла успешно')
     else:
-        await message.answer('У Вас нет права на выполнние этой команды')
+        await message.answer('У Вас нет прав на выполнение этой команды')
 
 
 def register_handlers_service(dp: Dispatcher):

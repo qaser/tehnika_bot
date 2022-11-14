@@ -443,7 +443,6 @@ async def vehicle_delete_done(message: types.Message, state: FSMContext):
         await state.reset_state()
 
 
-
 def register_handlers_vehicle(dp: Dispatcher):
     dp.register_message_handler(help_vehicle_message, commands='help')
     dp.register_message_handler(vehicle_start, commands='tehnika')

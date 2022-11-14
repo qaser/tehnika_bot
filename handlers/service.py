@@ -113,11 +113,20 @@ async def send_logs(message: types.Message):
         await bot.send_document(chat_id=MY_TELEGRAM_ID, document=content)
 
 
+# обработка команды /check
+async def bot_check(message: types.Message):
+    if message.chat.id == MY_TELEGRAM_ID:
+        await message.answer('Проверка прошла успешно')
+    else:
+        message.answer('У Вас нет права на выполнние этой команды')
+
+
 def register_handlers_service(dp: Dispatcher):
     dp.register_message_handler(reset_handler, commands='reset', state='*')
     dp.register_message_handler(count_users, commands='users')
     dp.register_message_handler(bot_offer, commands='offer')
     dp.register_message_handler(send_logs, commands='log')
+    dp.register_message_handler(bot_check, commands='check')
     dp.register_message_handler(add_offer, state=BotOffer.waiting_for_offer)
     dp.register_message_handler(
         confirm_offer,

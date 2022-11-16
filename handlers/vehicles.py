@@ -347,7 +347,7 @@ async def confirm_order(message: types.Message, state: FSMContext):
     await bot.send_message(
         chat_id=user_id,
         text=('Ваша заявка на технику обработана:\n'
-              f'{location}\n{vehicle}\n{order_confirm}')
+              f'{location}\n{vehicle}\n"{order_confirm}"')
     )
     await message.answer(
         ('Отлично! Данные успешно сохранены.\n'

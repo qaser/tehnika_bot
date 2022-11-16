@@ -19,7 +19,7 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           cd tehnika_bot/
-          rm tehnika_bot.log
+          rm logs_bot.log
           git pull
           pm2 restart tehnika
 

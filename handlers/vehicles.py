@@ -217,34 +217,36 @@ async def confirmation(message: types.Message, state: FSMContext):
             'Пожалуйста, выберите ответ, используя клавиатуру ниже.'
         )
         return
-    if message.text.lower() == 'нет':
+    if message.text.lower() == 'да':
+        user_data = await state.get_data()
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        vehicles.insert_one(
+            {
+                'date': date,
+                'user': message.from_user.full_name,
+                'user_id': message.from_user.id,
+                'location': user_data['chosen_location'],
+                'vehicle': user_data['chosen_vehicle'],
+                'time': user_data['chosen_vehicle_time'],
+                'comment': user_data['comment'],
+                'confirm': False,
+                'confirm_comment': '',
+            }
+        )
+        await message.answer(
+            ('Отлично! Данные успешно сохранены.\n'
+            'Если необходимо выбрать ещё технику нажмите /tehnika'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.finish()
+    else:
         await message.answer(
             ('Хорошо. Данные не сохранены.\n'
              'Если необходимо выбрать технику снова - нажмите /tehnika'),
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.reset_state()
-    user_data = await state.get_data()
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    vehicles.insert_one(
-        {
-            'date': date,
-            'user': message.from_user.full_name,
-            'user_id': message.from_user.id,
-            'location': user_data['chosen_location'],
-            'vehicle': user_data['chosen_vehicle'],
-            'time': user_data['chosen_vehicle_time'],
-            'comment': user_data['comment'],
-            'confirm': False,
-            'confirm_comment': '',
-        }
-    )
-    await message.answer(
-        ('Отлично! Данные успешно сохранены.\n'
-         'Если необходимо выбрать ещё технику нажмите /tehnika'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
+        await state.finish()
 
 
 async def start_confirm_vehicle_orders(message: types.Message):
@@ -308,30 +310,33 @@ async def confirm_order(message: types.Message, state: FSMContext):
             'Пожалуйста, выберите ответ, используя клавиатуру ниже.'
         )
         return
-    if message.text.lower() == 'нет':
-        await message.answer(
-            ('Хорошо. Данные не сохранены.\n'
-             'Если необходимо продолжить - нажмите /confirm'),
-            reply_markup=types.ReplyKeyboardRemove()
-        )
-        await state.reset_state()
-    buffer_data = await state.get_data()
-    comment = buffer_data['confirm_comment']
-    order = buffer_data['chosen_order']
-    vehicle, location, time = order.split(' | ')
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    vehicles.update_one(
+    if message.text.lower() == 'да':
+        buffer_data = await state.get_data()
+        comment = buffer_data['confirm_comment']
+        order = buffer_data['chosen_order']
+        vehicle, location, time = order.split(' | ')
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        vehicles.update_one(
+            {
+                'date': date,
+                'vehicle': vehicle,
+                'location': location,
+                'time': time,
+            },
+            {
+                '$set': {
+                    'confirm_comment': comment,
+                    'confirm': True
+                }
+            }
+        }
+    )
+    order = vehicles.find_one(
         {
             'date': date,
             'vehicle': vehicle,
             'location': location,
             'time': time,
-        },
-        {
-            '$set': {
-                'confirm_comment': comment,
-                'confirm': True
-            }
         }
     )
     order = vehicles.find_one(
@@ -410,32 +415,33 @@ async def vehicle_delete_done(message: types.Message, state: FSMContext):
             'Пожалуйста, выберите ответ, используя клавиатуру ниже.'
         )
         return
-    if message.text.lower() == 'нет':
+    if message.text.lower() == 'да':
+        buffer_data = await state.get_data()
+        order = buffer_data['chosen_order']
+        location, vehicle, time = order.split(' | ')
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        vehicles.delete_one(
+            {
+                'date': date,
+                'vehicle': vehicle,
+                'location': location,
+                'time': time,
+            },
+        )
+        await message.answer(
+            ('Заявка удалена.\n'
+            'Если необходимо продолжить удаление заявок нажмите /tehnika_del\n\n'
+            'Если Вам необходим список заявок - нажмите /report'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.finish()
+    else:
         await message.answer(
             ('Заявка не удалена.\n'
              'Если необходимо выбрать другую заявку - нажмите /tehnika_del'),
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.reset_state()
-    buffer_data = await state.get_data()
-    order = buffer_data['chosen_order']
-    location, vehicle, time = order.split(' | ')
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    vehicles.delete_one(
-        {
-            'date': date,
-            'vehicle': vehicle,
-            'location': location,
-            'time': time,
-        },
-    )
-    await message.answer(
-        ('Заявка удалена.\n'
-         'Если необходимо продолжить удаление заявок нажмите /tehnika_del\n\n'
-         'Если Вам необходим список заявок - нажмите /report'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
 
 
 def register_handlers_vehicle(dp: Dispatcher):

@@ -12,7 +12,7 @@ from scheduler.scheduler_jobs import scheduler, scheduler_jobs
 from texts.initial import INITIAL_TEXT
 
 logging.basicConfig(
-    filename='tehnika_bot.log',
+    filename='logs_bot.log',
     level=logging.INFO,
     filemode='a',
     format='%(asctime)s - %(message)s',
@@ -39,16 +39,6 @@ async def start_handler(message: types.Message):
             text=f'Добавлен новый пользователь в БД:\n{user.full_name}'
         )
     await message.answer(text=INITIAL_TEXT)
-
-
-@dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
-async def delete_service_message(message: types.Message):
-    await bot.delete_message(message.chat.id, message.message_id)
-
-
-@dp.message_handler(content_types=types.ContentType.LEFT_CHAT_MEMBER)
-async def delete_message_left_member(message: types.Message):
-    await bot.delete_message(message.chat.id, message.message_id)
 
 
 async def on_startup(_):

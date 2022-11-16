@@ -74,40 +74,50 @@ async def confirm_offer(message: types.Message, state: FSMContext):
             'Пожалуйста, отправьте "Да" или "Нет"'
         )
         return
-    if message.text.lower() == 'нет':
+    if message.text.lower() == 'да':
+        buffer_data = await state.get_data()
+        offer = buffer_data['offer']
+        user = message.from_user
+        date = dt.datetime.today().strftime('%d.%m.%Y')
+        offers.insert_one(
+            {
+                'date': date,
+                'user_id': user.id,
+                'offer': offer,
+            }
+        )
+        await message.answer(
+            ('Отлично! Сообщение отправлено.\n'
+            'Спасибо за отзыв!'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.finish()
+        await bot.send_message(
+            chat_id=MY_TELEGRAM_ID,
+            text=f'Получен новый отзыв от {user.full_name}:\n{offer}'
+        )
+    else:
         await message.answer(
             ('Хорошо. Отзыв не сохранен.\n'
              'Если необходимо отправить новый отзыв - нажмите /offer'),
             reply_markup=types.ReplyKeyboardRemove()
         )
         await state.reset_state()
-    buffer_data = await state.get_data()
-    offer = buffer_data['offer']
-    user = message.from_user
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    offers.insert_one(
-        {
-            'date': date,
-            'user_id': user.id,
-            'offer': offer,
-        }
-    )
-    await message.answer(
-        ('Отлично! Сообщение отправлено.\n'
-         'Спасибо за отзыв!'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
-    await bot.send_message(
-        chat_id=MY_TELEGRAM_ID,
-        text=f'Получен новый отзыв от {user.full_name}:\n{offer}'
-    )
+
+
+# обработка команды /log
+async def send_logs(message: types.Message):
+    file = f'logs_bot.log'
+    with open(file, 'rb') as f:
+        content = f.read()
+        await bot.send_document(chat_id=MY_TELEGRAM_ID, document=content)
 
 
 def register_handlers_service(dp: Dispatcher):
     dp.register_message_handler(reset_handler, commands='reset', state='*')
     dp.register_message_handler(count_users, commands='users')
     dp.register_message_handler(bot_offer, commands='offer')
+    dp.register_message_handler(send_logs, commands='log')
     dp.register_message_handler(add_offer, state=BotOffer.waiting_for_offer)
     dp.register_message_handler(
         confirm_offer,

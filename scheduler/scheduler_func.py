@@ -100,6 +100,6 @@ async def send_vehicle_month_resume():
         f'Замыкает тройку - {veh_max_3} ({veh_count_3} {word_veh_3}).\n'
         'Где-то в сторонке "рыдает" '
         f'{veh_max_last} - {veh_count_last} {word_veh_last}.\n\n'
-        f'Примерно {accept_percent}% из всего количества заявок были одобрены.\n\n'
+        f'{accept_percent}% из всего количества заявок были одобрены.\n\n'
     )
     await bot.send_message(chat_id=CHAT_ID_GKS, text=message)

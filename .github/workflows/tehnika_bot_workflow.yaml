@@ -21,7 +21,7 @@ jobs:
           cd tehnika_bot/
           rm tehnika_bot.log
           git pull
-          pm2 restart tehnika_bot
+          pm2 restart tehnika
 
   send_message:
     runs-on: ubuntu-latest

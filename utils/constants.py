@@ -1,3 +1,5 @@
+TIME_ZONE = 'Asia/Yekaterinburg'
+
 VEHICLES = [
     'Автокран 25тн',
     'Автокран LIEBHERR',
@@ -25,6 +27,7 @@ PERIODS = [
     'На 2 часа',
     'На 4 часа',
     'На 6 часов',
+    'В ночь'
 ]
 
 LOCATIONS = [

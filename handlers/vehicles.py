@@ -329,8 +329,7 @@ async def confirm_order(message: types.Message, state: FSMContext):
                     'confirm': True
                 }
             }
-        }
-    )
+        )
     order = vehicles.find_one(
         {
             'date': date,

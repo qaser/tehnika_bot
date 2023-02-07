@@ -347,6 +347,12 @@ async def confirm_order(message: types.Message, state: FSMContext):
             text=('Ваша заявка на технику обработана:\n'
                 f'{location}\n{vehicle}\n"{order_confirm}"')
         )
+        await message.answer(
+            ('Отлично! Данные успешно сохранены.\n'
+            'Если необходимо продолжить работу с заявками нажмите /confirm\n\n'
+            'Если необходим отчёт по заявкам - нажмите /resume'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
         await state.finish()
     else:
         await message.answer(
@@ -354,7 +360,7 @@ async def confirm_order(message: types.Message, state: FSMContext):
              'Если необходимо подтвердить другую заявку - нажмите /confirm'),
             reply_markup=types.ReplyKeyboardRemove()
         )
-        await state.reset_state()
+        await state.finish()
 
 
 async def vehicle_delete(message: types.Message):

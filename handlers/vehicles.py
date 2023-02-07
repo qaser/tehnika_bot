@@ -1,3 +1,5 @@
+# TODO сделать проверку на ввод техники при подтверждении
+
 import datetime as dt
 
 import pymongo
@@ -312,10 +314,10 @@ async def confirm_order(message: types.Message, state: FSMContext):
         return
     if message.text.lower() == 'да':
         buffer_data = await state.get_data()
+        date = dt.datetime.today().strftime('%d.%m.%Y')
         comment = buffer_data['confirm_comment']
         order = buffer_data['chosen_order']
         vehicle, location, time = order.split(' | ')
-        date = dt.datetime.today().strftime('%d.%m.%Y')
         vehicles.update_one(
             {
                 'date': date,
@@ -330,36 +332,29 @@ async def confirm_order(message: types.Message, state: FSMContext):
                 }
             }
         )
-    order = vehicles.find_one(
-        {
-            'date': date,
-            'vehicle': vehicle,
-            'location': location,
-            'time': time,
-        }
-    )
-    order = vehicles.find_one(
-        {
-            'date': date,
-            'vehicle': vehicle,
-            'location': location,
-            'time': time,
-        }
-    )
-    user_id = order.get('user_id')
-    order_confirm = order.get('confirm_comment')
-    await bot.send_message(
-        chat_id=user_id,
-        text=('Ваша заявка на технику обработана:\n'
-              f'{location}\n{vehicle}\n"{order_confirm}"')
-    )
-    await message.answer(
-        ('Отлично! Данные успешно сохранены.\n'
-         'Если необходимо продолжить работу с заявками нажмите /confirm\n\n'
-         'Если необходим отчёт по заявкам - нажмите /resume'),
-        reply_markup=types.ReplyKeyboardRemove()
-    )
-    await state.finish()
+        order = vehicles.find_one(
+            {
+                'date': date,
+                'vehicle': vehicle,
+                'location': location,
+                'time': time,
+            }
+        )
+        user_id = order.get('user_id')
+        order_confirm = order.get('confirm_comment')
+        await bot.send_message(
+            chat_id=user_id,
+            text=('Ваша заявка на технику обработана:\n'
+                f'{location}\n{vehicle}\n"{order_confirm}"')
+        )
+        await state.finish()
+    else:
+        await message.answer(
+            ('Хорошо. Данные не сохранены.\n'
+             'Если необходимо подтвердить другую заявку - нажмите /confirm'),
+            reply_markup=types.ReplyKeyboardRemove()
+        )
+        await state.reset_state()
 
 
 async def vehicle_delete(message: types.Message):

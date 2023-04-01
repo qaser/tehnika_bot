@@ -12,6 +12,8 @@ from handlers.service import register_handlers_service
 from handlers.vehicles import register_handlers_vehicle
 from scheduler.scheduler_jobs import scheduler, scheduler_jobs
 from texts.initial import INITIAL_TEXT
+from config.telegram_config import PASSWORD
+
 
 logging.basicConfig(
     filename='logs_bot.log',
@@ -23,57 +25,34 @@ logging.basicConfig(
 )
 
 
-# class PasswordCheck(StatesGroup):
-#     waiting_password = State()
+class PasswordCheck(StatesGroup):
+    waiting_password = State()
 
 
 @dp.message_handler(commands=['start'])
 async def start_handler(message: types.Message):
-    # user = message.from_user
-    # check_user = users.find_one({'user_id': user.id})
-    # if check_user is not None:
-    #     await message.answer(INITIAL_TEXT)
-    # else:
-    #     await message.answer('Введите пароль')
-    #     await PasswordCheck.waiting_password.set()
-    user = message.from_user
-    # проверяю есть ли пользователь в БД, если нет - добавляю
-    check_user = users.find_one({'id': user.id})
-    if check_user is None:
-        users.insert_one({
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'username': user.username,
-            'place_of_work': '',
-        })
+    user_id = message.from_user.id
+    check_user = users.find_one({'user_id': user_id})
+    if check_user is not None:
+        await message.answer(INITIAL_TEXT)
+    else:
+        await message.answer('Введите пароль')
+        await PasswordCheck.waiting_password.set()
+
+
+@dp.message_handler(state=PasswordCheck.waiting_password)
+async def check_password(message: types.Message, state: FSMContext):
+    if message.text == PASSWORD:
+        await message.answer(INITIAL_TEXT)
+        await state.reset_state()
+        await state.reset_data()
         await bot.send_message(
             chat_id=MY_TELEGRAM_ID,
-            text=f'Добавлен новый пользователь в БД:\n{user.full_name}'
+            text=f'Добавлен новый пользователь в БД:\n{message.from_user.full_name}'
         )
-    await message.answer(text=INITIAL_TEXT)
-
-
-# @dp.message_handler(state=PasswordCheck.waiting_password)
-# async def check_password(message: types.Message, state: FSMContext):
-#     if message.text == PASSWORD:
-#         await message.answer(INITIAL_TEXT)
-#         await state.reset_state()
-#         await state.reset_data()
-#         users.insert_one({
-#             'id': user.id,
-#             'first_name': user.first_name,
-#             'last_name': user.last_name,
-#             'username': user.username,
-#             'place_of_work': '',
-#         })
-#         await bot.send_message(
-#             chat_id=MY_TELEGRAM_ID,
-#             text=f'Добавлен новый пользователь в БД:\n{user.full_name}'
-#         )
-#     else:
-#         await message.answer('Пароль неверный, повторите попытку')
-#         return
+    else:
+        await message.answer('Пароль неверный, повторите попытку')
+        return
 
 
 @dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)

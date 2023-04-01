@@ -46,6 +46,7 @@ async def help_vehicle_message(message: types.Message):
             'Для получения информации по доступным командам нажмите /help'
         )
     )
+    await bot.delete_message(message.chat.id, message.message_id)
 
 
 # команда /zayavka - перенаправит юзера к боту для заказа техники
@@ -54,6 +55,7 @@ async def redirect_vehicle(message: types.Message):
         chat_id=message.from_user.id,
         text='Для начала нажмите\n\n/tehnika'
     )
+    await bot.delete_message(message.chat.id, message.message_id)
 
 
 # команда /report - отчёт о заявках техники
@@ -95,6 +97,7 @@ async def send_vehicle_report(message: types.Message):
         text=final_message,
         parse_mode=types.ParseMode.HTML,
     )
+    await bot.delete_message(message.chat.id, message.message_id)
 
 
 # команда /resume - результаты согласования техники
@@ -123,6 +126,7 @@ async def send_vehicle_confirm_resume(message: types.Message):
         text=final_message,
         parse_mode=types.ParseMode.HTML,
     )
+    await bot.delete_message(message.chat.id, message.message_id)
 
 
 # команда /tehnika - входная точка для заявок техники

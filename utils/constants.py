@@ -2,7 +2,7 @@ TIME_ZONE = 'Asia/Yekaterinburg'
 
 VEHICLES = [
     'Автокран 25тн',
-    'Автокран LIEBHERR',
+    'Автокран ZOOMLION ZTC1000V',
     'Амкадор',
     'Бортовая',
     'Бортовая - "кислородка"',

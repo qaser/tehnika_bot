@@ -26,11 +26,11 @@ def scheduler_jobs():
         minute=30,
         timezone=const.TIME_ZONE
     )
-    scheduler.add_job(
-        send_vehicle_month_resume,
-        'cron',
-        day='1',
-        hour=10,
-        minute=0,
-        timezone=const.TIME_ZONE
-    )
+    # scheduler.add_job(
+    #     send_vehicle_month_resume,
+    #     'cron',
+    #     day='1',
+    #     hour=10,
+    #     minute=0,
+    #     timezone=const.TIME_ZONE
+    # )

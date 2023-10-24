@@ -318,7 +318,7 @@ async def confirm_order(message: types.Message, state: FSMContext):
         return
     if message.text.lower() == 'да':
         buffer_data = await state.get_data()
-        date = dt.datetime.today().strftime('%d.%m.%Y')
+        date = dt.datetime.today()
         comment = buffer_data['confirm_comment']
         order = buffer_data['chosen_order']
         vehicle, location, time = order.split(' | ')
@@ -374,7 +374,7 @@ async def vehicle_delete(message: types.Message):
             reply_markup=types.ReplyKeyboardRemove()
         )
     else:
-        date = dt.datetime.today().strftime('%d.%m.%Y')
+        date = dt.datetime.today()
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         vehicle_orders = list(vehicles.find({'date': date}).sort(
             'location',
@@ -423,7 +423,7 @@ async def vehicle_delete_done(message: types.Message, state: FSMContext):
         buffer_data = await state.get_data()
         order = buffer_data['chosen_order']
         location, vehicle, time = order.split(' | ')
-        date = dt.datetime.today().strftime('%d.%m.%Y')
+        date = dt.datetime.today()
         vehicles.delete_one(
             {
                 'date': date,

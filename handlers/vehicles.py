@@ -60,8 +60,8 @@ async def redirect_vehicle(message: types.Message):
 
 # команда /report - отчёт о заявках техники
 async def send_vehicle_report(message: types.Message):
-    date = dt.datetime.today().strftime('%d.%m.%Y')
-    date_time = dt.datetime.today().strftime('%H:%M')
+    date = dt.datetime.today()
+    date_time = dt.datetime.today()
     queryset = list(vehicles.find({'date': date}))
     if len(queryset) == 0:
         final_message = 'Заявки на технику пока отсутствуют'
@@ -102,7 +102,7 @@ async def send_vehicle_report(message: types.Message):
 
 # команда /resume - результаты согласования техники
 async def send_vehicle_confirm_resume(message: types.Message):
-    date = dt.datetime.today().strftime('%d.%m.%Y')
+    date = dt.datetime.today()
     queryset = list(vehicles.find({'date': date, 'confirm': True}))
     result = ''
     if len(queryset) == 0:
@@ -225,7 +225,7 @@ async def confirmation(message: types.Message, state: FSMContext):
         return
     if message.text.lower() == 'да':
         user_data = await state.get_data()
-        date = dt.datetime.today().strftime('%d.%m.%Y')
+        date = dt.datetime.today()
         vehicles.insert_one(
             {
                 'date': date,
@@ -256,7 +256,7 @@ async def confirmation(message: types.Message, state: FSMContext):
 
 
 async def start_confirm_vehicle_orders(message: types.Message):
-    date = dt.datetime.today().strftime('%d.%m.%Y')
+    date = dt.datetime.today()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     vehicle_orders = list(vehicles.find({'date': date, 'confirm': False}).sort(
         'vehicle',

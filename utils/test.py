@@ -11,10 +11,11 @@ vehicles = db['vehicles']
 
 qs = vehicles.find({})
 for v in list(qs):
-    date = v.get('date').strftime('%d.%m.%Y')
+    date =v.get('date')
+    datetime_object = date.strftime('%d.%m.%Y')
     vehicles.update_one(
         {'_id': v.get('_id')},
-        {'$set': {'date': date}}
+        {'$set': {'date': datetime_object, 'datetime': date}}
     )
 
 

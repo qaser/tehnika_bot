@@ -225,10 +225,11 @@ async def confirmation(message: types.Message, state: FSMContext):
         return
     if message.text.lower() == 'да':
         user_data = await state.get_data()
-        date = dt.datetime.today().strftime('%d.%m.%Y')
+        date = dt.datetime.today()
         vehicles.insert_one(
             {
-                'date': date,
+                'date': date.strftime('%d.%m.%Y'),
+                'datetime': date,
                 'user': message.from_user.full_name,
                 'user_id': message.from_user.id,
                 'location': user_data['chosen_location'],

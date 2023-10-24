@@ -38,7 +38,6 @@ async def send_vehicle_month_resume():
                     f'<u>Распределение по направлениям:</u>\n{text_location}\n'
                     f'<u>Распределение по виду транспорта:</u>\n{text_vehicle}')
     await bot.send_message(chat_id=CHAT_ID_GKS, text=summary_text, parse_mode=ParseMode.HTML)
-    # await bot.send_message(chat_id=MY_TELEGRAM_ID, text=summary_text, parse_mode=ParseMode.HTML)
 
 
 def res_generator(group, period):

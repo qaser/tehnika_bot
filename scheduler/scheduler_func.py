@@ -31,18 +31,19 @@ async def send_vehicle_notify():
 # функция формирования и отправки статистики по технике
 async def send_vehicle_month_resume():
     previous_month = dt.datetime.now() - relativedelta(months=1)
-    count_veh = vehicles.count_documents({'date': {'$gt': previous_month}})
+    count_veh = vehicles.count_documents({'datetime': {'$gt': previous_month}})
     text_location = res_generator('location', previous_month)
     text_vehicle = res_generator('vehicle', previous_month)
     summary_text = (f'За прошедший месяц ботом получено заявок: {count_veh}\n\n'
                     f'<u>Распределение по направлениям:</u>\n{text_location}\n'
                     f'<u>Распределение по виду транспорта:</u>\n{text_vehicle}')
-    await bot.send_message(chat_id=CHAT_ID_GKS, text=summary_text, parse_mode=ParseMode.HTML)
+    # await bot.send_message(chat_id=CHAT_ID_GKS, text=summary_text, parse_mode=ParseMode.HTML)
+    await bot.send_message(chat_id=MY_TELEGRAM_ID, text=summary_text, parse_mode=ParseMode.HTML)
 
 
 def res_generator(group, period):
     pipeline = [
-        {'$match': {'date': {'$gt': period}}},
+        {'$match': {'datetime': {'$gt': period}}},
         {'$group': {'_id': f'${group}', 'count': {'$sum': 1}}},
         {'$sort': { 'count': -1}}
     ]

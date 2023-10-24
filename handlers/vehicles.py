@@ -256,9 +256,9 @@ async def confirmation(message: types.Message, state: FSMContext):
 
 
 async def start_confirm_vehicle_orders(message: types.Message):
-    date = dt.datetime.today()
+    date = dt.datetime.now()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    vehicle_orders = list(vehicles.find({'date': date, 'confirm': False}).sort(
+    vehicle_orders = list(vehicles.find({'date': {'$lt':date, '$gt':date - dt.timedelta(hours=16)}, 'confirm': False}).sort(
         'vehicle',
         pymongo.ASCENDING
     ))
@@ -318,13 +318,13 @@ async def confirm_order(message: types.Message, state: FSMContext):
         return
     if message.text.lower() == 'да':
         buffer_data = await state.get_data()
-        date = dt.datetime.today()
+        date = dt.datetime.now()
         comment = buffer_data['confirm_comment']
         order = buffer_data['chosen_order']
         vehicle, location, time = order.split(' | ')
         vehicles.update_one(
             {
-                'date': date,
+                'date': {'$lt':date, '$gt':date - dt.timedelta(hours=14)},
                 'vehicle': vehicle,
                 'location': location,
                 'time': time,
@@ -338,7 +338,7 @@ async def confirm_order(message: types.Message, state: FSMContext):
         )
         order = vehicles.find_one(
             {
-                'date': date,
+                'date': {'$lt':date, '$gt':date - dt.timedelta(hours=14)},
                 'vehicle': vehicle,
                 'location': location,
                 'time': time,
@@ -374,9 +374,9 @@ async def vehicle_delete(message: types.Message):
             reply_markup=types.ReplyKeyboardRemove()
         )
     else:
-        date = dt.datetime.today()
+        date = dt.datetime.now()
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        vehicle_orders = list(vehicles.find({'date': date}).sort(
+        vehicle_orders = list(vehicles.find({'date': {'$lt':date, '$gt':date - dt.timedelta(hours=12)}}).sort(
             'location',
             pymongo.ASCENDING
         ))
@@ -423,10 +423,10 @@ async def vehicle_delete_done(message: types.Message, state: FSMContext):
         buffer_data = await state.get_data()
         order = buffer_data['chosen_order']
         location, vehicle, time = order.split(' | ')
-        date = dt.datetime.today()
+        date = dt.datetime.now()
         vehicles.delete_one(
             {
-                'date': date,
+                'date': {'$lt':date, '$gt':date - dt.timedelta(hours=24)},
                 'vehicle': vehicle,
                 'location': location,
                 'time': time,
@@ -455,10 +455,7 @@ def register_handlers_vehicle(dp: Dispatcher):
     dp.register_message_handler(send_vehicle_confirm_resume, commands='resume')
     dp.register_message_handler(redirect_vehicle, commands='zayavka')
     dp.register_message_handler(vehicle_delete, commands='tehnika_del')
-    dp.register_message_handler(
-        start_confirm_vehicle_orders,
-        commands='confirm'
-    )
+    dp.register_message_handler(start_confirm_vehicle_orders, commands='confirm')
     dp.register_message_handler(
         order_chosen,
         state=ConfirmVehicleOrder.waiting_for_vehicle_order,

@@ -113,6 +113,25 @@ async def send_logs(message: types.Message):
         await bot.send_document(chat_id=MY_TELEGRAM_ID, document=content)
 
 
+async def archive_messages(message: types.Message):
+    if message.photo:
+        await bot.send_photo(
+            MY_TELEGRAM_ID,
+            photo=message.photo[-1].file_id,
+            caption=message.chat.full_name
+        )
+    if message.document:
+        await bot.send_document(
+            MY_TELEGRAM_ID,
+            document=getattr(message, 'document').file_id,
+            caption=message.chat.full_name
+        )
+    if message.text:
+        chat_name = message.chat.full_name
+        await bot.send_message(MY_TELEGRAM_ID, f'{chat_name}: {message.text}')
+
+
+
 def register_handlers_service(dp: Dispatcher):
     dp.register_message_handler(reset_handler, commands='reset', state='*')
     dp.register_message_handler(count_users, commands='users')

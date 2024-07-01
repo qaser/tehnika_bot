@@ -1,5 +1,3 @@
-# TODO сделать проверку на ввод техники при подтверждении
-
 import datetime as dt
 
 import pymongo
@@ -30,23 +28,6 @@ class ConfirmVehicleOrder(StatesGroup):
 class DeleteVehicleOrder(StatesGroup):
     waiting_for_delete_confirm = State()
     waiting_for_delete_done = State()
-
-
-# команда /help
-async def help_vehicle_message(message: types.Message):
-    await message.answer(
-        text=(
-            'Для создания заявки на технику нажмите /tehnika\n'
-            'Для удаления введённой заявки на технику нажмите /tehnika_del\n'
-            'Для просмотра списка заявок нажмите /report\n'
-            'Для согласования техники нажмите /confirm\n'
-            'Для просмотра согласованной техники нажмите /resume\n'
-            'Для отправки отзыва о работе бота или пожеланий нажмите /offer\n'
-            'Для сброса текущего диалога и настроек клавиатуры нажмите /reset\n'
-            'Для получения информации по доступным командам нажмите /help'
-        )
-    )
-    await bot.delete_message(message.chat.id, message.message_id)
 
 
 # команда /zayavka - перенаправит юзера к боту для заказа техники

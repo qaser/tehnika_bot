@@ -1,76 +1,63 @@
+import asyncio
 import logging
 
-from aiogram import types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.utils import executor
+# from aiogram.filters.command import Command
+# from aiogram.fsm.context import FSMContext
+# from aiogram.types import MessageReactionUpdated
+from aiogram_dialog import setup_dialogs
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from config.bot_config import bot, dp
-from config.mongo_config import users
-from config.telegram_config import MY_TELEGRAM_ID
-from handlers.service import register_handlers_service
-from handlers.vehicles import register_handlers_vehicle
-from scheduler.scheduler_jobs import scheduler, scheduler_jobs
-from texts.initial import INITIAL_TEXT
-from config.telegram_config import PASSWORD
+from handlers import vehicle, service, report
+from scheduler.scheduler_func import send_vehicle_month_resume, send_vehicle_notify
+from utils.constants import TIME_ZONE
 
 
-logging.basicConfig(
-    filename='logs_bot.log',
-    level=logging.INFO,
-    filemode='a',
-    format='%(asctime)s - %(message)s',
-    datefmt='%d.%m.%y %H:%M:%S',
-    encoding='utf-8'
-)
-
-
-class PasswordCheck(StatesGroup):
-    waiting_password = State()
-
-
-@dp.message_handler(commands=['start'])
-async def start_handler(message: types.Message):
-    user_id = message.from_user.id
-    check_user = users.find_one({'user_id': user_id})
-    if check_user is not None:
-        await message.answer(INITIAL_TEXT)
-    else:
-        await message.answer('Введите пароль')
-        await PasswordCheck.waiting_password.set()
-
-
-@dp.message_handler(state=PasswordCheck.waiting_password)
-async def check_password(message: types.Message, state: FSMContext):
-    if message.text == PASSWORD:
-        await message.answer(INITIAL_TEXT)
-        await state.reset_state()
-        await state.reset_data()
-        await bot.send_message(
-            chat_id=MY_TELEGRAM_ID,
-            text=f'Добавлен новый пользователь в БД:\n{message.from_user.full_name}'
-        )
-    else:
-        await message.answer('Пароль неверный, повторите попытку')
-        return
-
-
-@dp.message_handler(content_types=types.ContentType.NEW_CHAT_MEMBERS)
-async def delete_service_message(message: types.Message):
-    await bot.delete_message(message.chat.id, message.message_id)
-
-
-@dp.message_handler(content_types=types.ContentType.LEFT_CHAT_MEMBER)
-async def delete_message_left_member(message: types.Message):
-    await bot.delete_message(message.chat.id, message.message_id)
-
-
-async def on_startup(_):
-    scheduler_jobs()
-
-
-if __name__ == '__main__':
+async def main():
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(
+        send_vehicle_notify,
+        'cron',
+        day_of_week='mon-thu',
+        hour=16,
+        minute=0,
+        timezone=TIME_ZONE
+    )
+    # напоминание о заказе техники в "пятницу"
+    scheduler.add_job(
+        send_vehicle_notify,
+        'cron',
+        day_of_week='fri',
+        hour=11,
+        minute=30,
+        timezone=TIME_ZONE
+    )
+    scheduler.add_job(
+        send_vehicle_month_resume,
+        'cron',
+        day='1',
+        hour=10,
+        minute=0,
+        timezone=TIME_ZONE
+    )
     scheduler.start()
-    register_handlers_service(dp)
-    register_handlers_vehicle(dp)
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    dp.include_routers(
+        service.router,
+        vehicle.router,
+        report.router,
+        vehicle.dialog,
+    )
+    setup_dialogs(dp)
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(
+        filename='logs_bot.log',
+        level=logging.INFO,
+        filemode='a',
+        format='%(asctime)s - %(message)s',
+        datefmt='%d.%m.%y %H:%M:%S',
+        encoding='utf-8',
+    )
+    asyncio.run(main())

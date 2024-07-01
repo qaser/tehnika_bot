@@ -3,8 +3,7 @@ from dateutil.relativedelta import relativedelta
 
 from config.bot_config import bot
 from config.mongo_config import vehicles
-from config.telegram_config import CHAT_ID_GKS, MY_TELEGRAM_ID
-from aiogram.types import ParseMode
+from config.telegram_config import CHAT_ID_GKS
 
 
 # функция напоминания о возможности зявить технику
@@ -37,7 +36,7 @@ async def send_vehicle_month_resume():
     summary_text = (f'За прошедший месяц ботом получено заявок: {count_veh}\n\n'
                     f'<u>Распределение по направлениям:</u>\n{text_location}\n'
                     f'<u>Распределение по виду транспорта:</u>\n{text_vehicle}')
-    await bot.send_message(chat_id=CHAT_ID_GKS, text=summary_text, parse_mode=ParseMode.HTML)
+    await bot.send_message(chat_id=CHAT_ID_GKS, text=summary_text)
     # await bot.send_message(chat_id=MY_TELEGRAM_ID, text=summary_text, parse_mode=ParseMode.HTML)
 
 

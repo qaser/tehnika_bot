@@ -9,7 +9,14 @@ from dialogs.for_vehicle.states import Vehicle
 from . import getters, keyboards, selected
 
 
-async def on_click(callback, button, dialog_manager):
+DONATE_NOTE = ('Уважаемый пользователь! Вы наверняка успели оценить удобство моего приложения.\n'
+               'Я рад стараться для Вас и делать приложение ещё лучше. Однако сервера требуют '
+               'оплаты, а новые фичи — разработки. Поэтому я был бы благодарен Вам за поддержку '
+               'моего скромного труда. Ваша финансовая помощь поможет мне развиваться дальше и '
+               'радовать Вас новыми обновлениями.')
+
+
+async def on_exit(callback, button, dialog_manager):
     try:
         await dialog_manager.done()
         await callback.message.delete()
@@ -25,7 +32,7 @@ def location_window():
     return Window(
         Const('Создание заявки на специальную технику.\nВыберите направление:'),
         keyboards.location_buttons(selected.on_chosen_location),
-        Cancel(Const('🔚 Выход'), on_click=on_click),
+        Cancel(Const('🔚 Выход'), on_click=on_exit),
         state=Vehicle.select_location,
         getter=getters.get_locations
     )
@@ -101,6 +108,33 @@ def done_window():
             id='new_request',
             on_click=new_request,
         ),
-        Cancel(Const('🔚 Выход'), on_click=on_click),
+        Button(
+            Const('⭐ Поддержать разработчика'),
+            id='donate',
+            on_click=selected.on_donate_menu
+        ),
+        Cancel(Const('🔚 Выход'), on_click=on_exit),
         state=Vehicle.done
+    )
+
+def donate_window():
+    return Window(
+        Const(DONATE_NOTE),
+        Button(
+            Const('Перевести 1 ⭐'),
+            id='donate_1',
+            on_click=selected.on_donate
+        ),
+        Button(
+            Const('Перевести 25 ⭐'),
+            id='donate_25',
+            on_click=selected.on_donate
+        ),
+        Button(
+            Const('Перевести 50 ⭐'),
+            id='donate_50',
+            on_click=selected.on_donate
+        ),
+        Back(Const('🔙 Назад')),
+        state=Vehicle.donate
     )

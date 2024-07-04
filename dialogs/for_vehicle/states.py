@@ -8,3 +8,4 @@ class Vehicle(StatesGroup):
     input_comment = State()
     confirm = State()
     done = State()
+    donate = State()

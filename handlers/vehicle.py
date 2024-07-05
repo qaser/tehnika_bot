@@ -46,8 +46,8 @@ async def on_pre_checkout_query(pre_checkout_query):
 async def on_successful_payment(message):
     await message.answer(
         ('Огромное спасибо!\nВаш айди транзакции:\n'
-         f'{message.successful_payment.telegram_payment_charge_id}\n'
-         'Сохраните его, если вдруг сделать возврат в будущем 😢'),
+         f'<code>{message.successful_payment.telegram_payment_charge_id}</code>\n'
+         'Сохраните его, если вдруг захотите сделать возврат в будущем 😢'),
         message_effect_id="5104841245755180586",
     )
     await bot.send_message(

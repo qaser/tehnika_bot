@@ -38,12 +38,12 @@ async def redirect_vehicle(message: Message):
 
 
 @router.pre_checkout_query()
-async def on_pre_checkout_query(pre_checkout_query, l10n):
+async def on_pre_checkout_query(pre_checkout_query):
     await pre_checkout_query.answer(ok=True)
 
 
 @router.message(F.successful_payment)
-async def on_successful_payment(message, l10n):
+async def on_successful_payment(message):
     await message.answer(
         ('Огромное спасибо!\nВаш айди транзакции:\n'
          f'{message.successful_payment.telegram_payment_charge_id}\n'

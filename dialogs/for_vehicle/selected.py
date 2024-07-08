@@ -65,6 +65,7 @@ async def on_donate_menu(callback, widget, manager: DialogManager):
 
 
 async def on_donate(callback, widget, manager: DialogManager):
+    context = manager.current_context()
     amount = int(widget.widget_id.split('_')[1])
     prices = [LabeledPrice(label="XTR", amount=amount)]
     builder = InlineKeyboardBuilder()
@@ -77,7 +78,7 @@ async def on_donate(callback, widget, manager: DialogManager):
         callback_data="cancel"
     )
     builder.adjust(1)
-    await callback.message.answer_invoice(
+    msg = await callback.message.answer_invoice(
         title='Добровольный перевод',
         description='Telegram Stars',
         prices=prices,
@@ -86,3 +87,4 @@ async def on_donate(callback, widget, manager: DialogManager):
         currency="XTR",
         reply_markup=builder.as_markup()
     )
+    context.dialog_data.update(msg_id=msg.message_id)

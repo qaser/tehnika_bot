@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram_dialog import Dialog, DialogManager, StartMode
 from config.bot_config import bot
-from aiogram.types import Message
+from aiogram.types import Message, PreCheckoutQuery
 
 from config.telegram_config import ADMIN_TELEGRAM_ID
 from dialogs.for_vehicle import windows
@@ -38,22 +38,23 @@ async def redirect_vehicle(message: Message):
 
 
 @router.pre_checkout_query()
-async def on_pre_checkout_query(pre_checkout_query):
+async def on_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
     await pre_checkout_query.answer(ok=True)
 
 
 @router.message(F.successful_payment)
-async def on_successful_payment(message):
+async def on_successful_payment(message: Message, dialog_manager: DialogManager):
+    context = dialog_manager.current_context()
     await message.answer(
         ('Огромное спасибо!\nВаш айди транзакции:\n'
          f'<code>{message.successful_payment.telegram_payment_charge_id}</code>\n'
          'Сохраните его, если вдруг захотите сделать возврат в будущем 😢'),
         message_effect_id="5104841245755180586",
     )
+    await bot.delete_message(message.chat.id, context.dialog_data['msg_id'])
     await bot.send_message(
         chat_id=ADMIN_TELEGRAM_ID,
         text='Получен донат!!!',
-        message_effect_id="5104841245755180586",
     )
 
 

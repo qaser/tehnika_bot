@@ -19,7 +19,7 @@ async def main():
         send_vehicle_notify,
         'cron',
         day_of_week='mon-thu',
-        hour=16,
+        hour=15,
         minute=0,
         timezone=TIME_ZONE
     )

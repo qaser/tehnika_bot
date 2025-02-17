@@ -1,8 +1,5 @@
 from aiogram_dialog import DialogManager
-from bson.objectid import ObjectId
 
-from config.mongo_config import users
-from dialogs.for_vehicle.states import Vehicle
 from utils.constants import LOCATIONS, VEHICLES, PERIODS
 
 

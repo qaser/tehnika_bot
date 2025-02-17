@@ -1,6 +1,4 @@
-import operator
-
-from aiogram_dialog.widgets.kbd import Column, Select, Group, ScrollingGroup
+from aiogram_dialog.widgets.kbd import Select, Group, ScrollingGroup
 from aiogram_dialog.widgets.text import Format
 
 SCROLLING_HEIGHT = 6

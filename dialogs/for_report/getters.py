@@ -30,4 +30,5 @@ async def get_report_data(dialog_manager: DialogManager, **kwargs):
         "result_by_vehicle": result_by_vehicle,
         "date": date,
         "current_time": dt.datetime.today().strftime('%H:%M'),
+        "has_orders": len(queryset) > 0,
     }

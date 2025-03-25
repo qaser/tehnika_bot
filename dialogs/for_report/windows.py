@@ -16,12 +16,12 @@ report_dialog = Dialog(
         Button(
             Const("По типу техники"),
             id="by_vehicle",
-            on_click=lambda c, b, m: m.dialog().switch_to(states.ReportSG.BY_VEHICLE),
+            on_click=selected.on_vehicle_filter,  # Используем отдельную функцию
         ),
         Button(
             Const("По подразделению"),
             id="by_location",
-            on_click=lambda c, b, m: m.dialog().switch_to(states.ReportSG.BY_LOCATION),
+            on_click=selected.on_location_filter,  # Используем отдельную функцию
         ),
         Cancel(Const("Закрыть")),
         state=states.ReportSG.CHOOSE_FILTER,

@@ -6,12 +6,20 @@ from aiogram_dialog.widgets.kbd import Button, Radio
 from . import getters, states
 
 
+async def on_vehicle_filter(callback: CallbackQuery, button: Button, manager: DialogManager):
+    await manager.switch_to(states.ReportSG.BY_VEHICLE)
+
+async def on_location_filter(callback: CallbackQuery, button: Button, manager: DialogManager):
+    await manager.switch_to(states.ReportSG.BY_LOCATION)
+
+
 async def on_filter_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
     filter_type = button.widget_id
     if filter_type == "by_vehicle":
-        await manager.dialog().switch_to(states.ReportStates.BY_VEHICLE)
+        await manager.switch_to(states.ReportStates.BY_VEHICLE)
     elif filter_type == "by_location":
-        await manager.dialog().switch_to(states.ReportStates.BY_LOCATION)
+        await manager.switch_to(states.ReportStates.BY_LOCATION)
+
 
 async def on_vehicle_selected(callback: CallbackQuery, widget: Radio, manager: DialogManager, item_id: str):
     data = await getters.get_report_data(manager)

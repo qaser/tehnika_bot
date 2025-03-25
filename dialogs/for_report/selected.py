@@ -1,23 +1,20 @@
 import datetime as dt
 
 from aiogram_dialog import DialogManager
-from aiogram.types import Message, LabeledPrice, PreCheckoutQuery, InlineKeyboardMarkup
-
-from dialogs.for_vehicle.states import Vehicle
-from utils.constants import LOCATIONS, VEHICLES, PERIODS
-from config.mongo_config import vehicles
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import CallbackQuery
+from aiogram_dialog.widgets.kbd import Button, Radio
+from . import getters, states
 
 
 async def on_filter_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
     filter_type = button.widget_id
     if filter_type == "by_vehicle":
-        await manager.dialog().switch_to(ReportStates.BY_VEHICLE)
+        await manager.dialog().switch_to(states.ReportStates.BY_VEHICLE)
     elif filter_type == "by_location":
-        await manager.dialog().switch_to(ReportStates.BY_LOCATION)
+        await manager.dialog().switch_to(states.ReportStates.BY_LOCATION)
 
 async def on_vehicle_selected(callback: CallbackQuery, widget: Radio, manager: DialogManager, item_id: str):
-    data = await get_report_data(manager)
+    data = await getters.get_report_data(manager)
     selected_vehicle = item_id
     report_lines = data["result_by_vehicle"].get(selected_vehicle, [])
 
@@ -26,12 +23,12 @@ async def on_vehicle_selected(callback: CallbackQuery, widget: Radio, manager: D
 
     await callback.message.answer(
         text=report_text,
-        parse_mode=types.ParseMode.HTML,
+        parse_mode='HTML',
     )
     await manager.done()
 
 async def on_location_selected(callback: CallbackQuery, widget: Radio, manager: DialogManager, item_id: str):
-    data = await get_report_data(manager)
+    data = await getters.get_report_data(manager)
     selected_location = item_id
     report_lines = data["result_by_location"].get(selected_location, [])
 
@@ -40,13 +37,13 @@ async def on_location_selected(callback: CallbackQuery, widget: Radio, manager: 
 
     await callback.message.answer(
         text=report_text,
-        parse_mode=types.ParseMode.HTML,
+        parse_mode='HTML',
     )
     await manager.done()
 
 
 async def on_full_report_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
-    data = await get_report_data(manager)
+    data = await getters.get_report_data(manager)
 
     if not data["has_orders"]:
         await callback.message.answer("Заявки на технику пока отсутствуют")
@@ -60,6 +57,6 @@ async def on_full_report_selected(callback: CallbackQuery, button: Button, manag
 
     await callback.message.answer(
         text=final_message,
-        parse_mode=types.ParseMode.HTML,
+        parse_mode='HTML',
     )
     await manager.done()

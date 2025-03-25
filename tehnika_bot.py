@@ -43,7 +43,7 @@ async def main():
         service.router,
         vehicle.router,
         report.router,
-        report_dialog,
+        # report_dialog,
         vehicle.dialog,
     )
     setup_dialogs(dp)

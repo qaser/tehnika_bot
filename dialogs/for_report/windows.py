@@ -9,22 +9,22 @@ report_dialog = Dialog(
     Window(
         Const("Выберите тип отчета:"),
         Button(
-            Const("Полный отчет (как раньше)"),
+            Const("Полный отчет"),
             id="full_report",
             on_click=selected.on_full_report_selected,
         ),
         Button(
             Const("По типу техники"),
             id="by_vehicle",
-            on_click=selected.on_filter_selected,
+            on_click=lambda c, b, m: m.dialog().switch_to(states.ReportSG.BY_VEHICLE),
         ),
         Button(
             Const("По подразделению"),
             id="by_location",
-            on_click=selected.on_filter_selected,
+            on_click=lambda c, b, m: m.dialog().switch_to(states.ReportSG.BY_LOCATION),
         ),
         Cancel(Const("Закрыть")),
-        state=states.ReportStates.CHOOSE_FILTER,
+        state=states.ReportSG.CHOOSE_FILTER,
         getter=getters.get_report_data,
     ),
     Window(
@@ -38,7 +38,7 @@ report_dialog = Dialog(
             on_click=selected.on_vehicle_selected,
         ),
         Back(Const("← Назад")),
-        state=states.ReportStates.BY_VEHICLE,
+        state=states.ReportSG.BY_VEHICLE,
         getter=getters.get_report_data,
     ),
     Window(
@@ -52,7 +52,7 @@ report_dialog = Dialog(
             on_click=selected.on_location_selected,
         ),
         Back(Const("← Назад")),
-        state=states.ReportStates.BY_LOCATION,
+        state=states.ReportSG.BY_LOCATION,
         getter=getters.get_report_data,
     ),
 )

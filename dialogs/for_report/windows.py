@@ -13,16 +13,16 @@ report_dialog = Dialog(
             id="full_report",
             on_click=selected.on_full_report_selected,
         ),
-        Button(
-            Const("По типу техники"),
-            id="by_vehicle",
-            on_click=selected.on_vehicle_filter,  # Используем отдельную функцию
-        ),
-        Button(
-            Const("По подразделению"),
-            id="by_location",
-            on_click=selected.on_location_filter,  # Используем отдельную функцию
-        ),
+        # Button(
+        #     Const("По типу техники"),
+        #     id="by_vehicle",
+        #     on_click=selected.on_vehicle_filter,  # Используем отдельную функцию
+        # ),
+        # Button(
+        #     Const("По подразделению"),
+        #     id="by_location",
+        #     on_click=selected.on_location_filter,  # Используем отдельную функцию
+        # ),
         Cancel(Const("Закрыть")),
         state=states.ReportSG.CHOOSE_FILTER,
         getter=getters.get_report_data,

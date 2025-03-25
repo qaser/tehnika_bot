@@ -1,5 +1,5 @@
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Back, Button, Cancel, Radio
+from aiogram_dialog.widgets.kbd import Back, Button, Cancel, Radio, Select
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog import Dialog
 from . import getters, selected, states
@@ -29,12 +29,11 @@ report_dialog = Dialog(
     ),
     Window(
         Const("Выберите тип техники:"),
-        Radio(
-            checked_text=Format("✓ {item}"),
-            unchecked_text=Format("  {item}"),
+        Select(
+            Format("{item[0]}"),  # Отображаемый текст
+            id="s_vehicles",
+            item_id_getter=lambda item: item[1],  # Используем второй элемент кортежа
             items="vehicles",
-            item_id_getter=lambda x: x,
-            id="vehicle_radio",
             on_click=selected.on_vehicle_selected,
         ),
         Back(Const("← Назад")),

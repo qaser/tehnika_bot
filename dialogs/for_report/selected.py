@@ -2,7 +2,7 @@ import datetime as dt
 
 from aiogram_dialog import DialogManager
 from aiogram.types import CallbackQuery
-from aiogram_dialog.widgets.kbd import Button, Radio
+from aiogram_dialog.widgets.kbd import Button, Radio, Select
 from . import getters, states
 
 
@@ -13,20 +13,28 @@ async def on_location_filter(callback: CallbackQuery, button: Button, manager: D
     await manager.switch_to(states.ReportSG.BY_LOCATION)
 
 
-async def on_filter_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
-    filter_type = button.widget_id
-    if filter_type == "by_vehicle":
-        await manager.switch_to(states.ReportStates.BY_VEHICLE)
-    elif filter_type == "by_location":
-        await manager.switch_to(states.ReportStates.BY_LOCATION)
+# async def on_filter_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
+#     filter_type = button.widget_id
+#     if filter_type == "by_vehicle":
+#         await manager.switch_to(states.ReportStates.BY_VEHICLE)
+#     elif filter_type == "by_location":
+#         await manager.switch_to(states.ReportStates.BY_LOCATION)
 
 
-async def on_vehicle_selected(callback: CallbackQuery, widget: Radio, manager: DialogManager, item_id: str):
+def vehicle_getter(data) -> list[tuple[str, str]]:
+    vehicles = data["vehicles"]
+    # Создаем список кортежей (текст, ID)
+    return [(vehicle, vehicle[:64]) for vehicle in vehicles]  # Ограничиваем длину ID
+
+
+async def on_vehicle_selected(callback: CallbackQuery, select: Select,
+                            manager: DialogManager, item_id: str):
     data = await getters.get_report_data(manager)
     selected_vehicle = item_id
     report_lines = data["result_by_vehicle"].get(selected_vehicle, [])
 
-    report_text = f"<b>Заявки на {selected_vehicle} {data['date']} по состоянию на {data['current_time']}(мск):</b>\n\n"
+    report_text = (f"<b>Заявки на {selected_vehicle} {data['date']} "
+                  f"по состоянию на {data['current_time']}(мск):</b>\n\n")
     report_text += "\n".join(report_lines)
 
     await callback.message.answer(

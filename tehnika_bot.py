@@ -1,14 +1,12 @@
 import asyncio
 import logging
 
-# from aiogram.filters.command import Command
-# from aiogram.fsm.context import FSMContext
-# from aiogram.types import MessageReactionUpdated
 from aiogram_dialog import setup_dialogs
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from config.bot_config import bot, dp
 from handlers import vehicle, service, report
+from dialogs.for_report.windows import report_dialog
 from scheduler.scheduler_func import send_vehicle_month_resume, send_vehicle_notify
 from utils.constants import TIME_ZONE
 
@@ -45,6 +43,7 @@ async def main():
         service.router,
         vehicle.router,
         report.router,
+        report_dialog,
         vehicle.dialog,
     )
     setup_dialogs(dp)

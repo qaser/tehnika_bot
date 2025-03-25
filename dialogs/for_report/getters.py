@@ -17,22 +17,18 @@ async def get_report_data(dialog_manager: DialogManager, **kwargs):
         time = i.get('time')
         comment = i.get('comment')
         user = i.get('user')
-
         # Группируем по технике
         if vehicle not in result_by_vehicle:
             result_by_vehicle[vehicle] = []
         result_by_vehicle[vehicle].append(f"{location} - {time.lower()}. \"{comment}\" ({user})")
-
         # Группируем по локациям
         if location not in result_by_location:
             result_by_location[location] = []
         result_by_location[location].append(f"{vehicle} - {time.lower()}. \"{comment}\" ({user})")
-
         # Для полного отчета (как в вашем оригинальном варианте)
         if vehicle not in full_report_data:
             full_report_data[vehicle] = {}
         full_report_data[vehicle][location] = [time.lower(), comment, user]
-
     # Формируем текст полного отчета
     full_report_text = ""
     for vehicle, loc_list in full_report_data.items():

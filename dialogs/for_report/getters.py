@@ -79,7 +79,6 @@ async def get_location_report(dialog_manager: DialogManager, **kwargs):
     locations = GKS_GROUP if location == 'ГКС' else [location]
     queryset = list(vehicles.find({'date': date, 'location': {'$in': locations}}))
     report_data = {}
-
     for entry in queryset:
         vehicle = entry.get('vehicle')
         location = entry.get('location')
@@ -105,7 +104,6 @@ async def get_location_report(dialog_manager: DialogManager, **kwargs):
 
         report_text += f'<u>{vehicle}</u>:\n{part_message}\n'
     return {
-        'location': location,
         'report_is_empty': True if len(queryset) == 0 else False,
         'report': report_text.strip(),
         'current_time': dt.datetime.today().strftime('%H:%M'),

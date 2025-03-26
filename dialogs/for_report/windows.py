@@ -84,7 +84,7 @@ def vehicle_filter_report_window():
 def location_filter_report_window():
     return Window(
         Const(REPORT_IS_EMPTY, when='report_is_empty'),
-        Format('Заявки на технику для "{location}" по состоянию на {date} {current_time}(мск):\n'),
+        Format('Заявки на технику по состоянию на {date} {current_time}(мск):\n'),
         Format('{report}'),
         Button(Const('🔙 Назад'), on_click=selected.on_location_filter, id='location_menu'),
         state=states.Report.LOCATION_REPORT,

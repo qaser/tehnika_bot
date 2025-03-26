@@ -37,12 +37,24 @@ async def on_vehicle_selected(callback: CallbackQuery, select: Select,
     await manager.done()
 
 
-async def on_location_selected(callback: CallbackQuery, widget: Radio, manager: DialogManager, item_id: str):
-    data = await getters.get_report_data(manager)
-    selected_location = item_id
-    report_lines = data["result_by_location"].get(selected_location, [])
+async def on_vehicle_selected(callback: CallbackQuery, select: Select,
+                            manager: DialogManager, item_id: str):
+    data = await getters.get_vehicle_window_data(manager)
+    selected_vehicle = item_id
 
-    report_text = f"<b>Заявки для {selected_location} {data['date']} по состоянию на {data['current_time']}(мск):</b>\n\n"
+    date = dt.datetime.today().strftime('%d.%m.%Y')
+    queryset = list(vehicles.find({'date': date, 'vehicle': selected_vehicle}))
+
+    report_lines = []
+    for i in queryset:
+        location = i.get('location')
+        time = i.get('time')
+        comment = i.get('comment')
+        user = i.get('user')
+        report_lines.append(f"{location} - {time.lower()}. \"{comment}\" ({user})")
+
+    report_text = (f"<b>Заявки на {selected_vehicle} {data['date']} "
+                  f"по состоянию на {data['current_time']}(мск):</b>\n\n")
     report_text += "\n".join(report_lines)
 
     await callback.message.answer(
@@ -51,19 +63,21 @@ async def on_location_selected(callback: CallbackQuery, widget: Radio, manager: 
     )
     await manager.done()
 
+async def on_location_selected(callback: CallbackQuery, widget: Radio,
+                             manager: DialogManager, item_id: str):
+    data = await getters.get_location_report_data(item_id, manager)
+    report_lines = []
 
-async def on_full_report_selected(callback: CallbackQuery, button: Button, manager: DialogManager):
-    data = await getters.get_report_data(manager)
-    if not data["has_orders"]:
-        await callback.message.answer("Заявки на технику пока отсутствуют")
-        await manager.done()
-        return
-    final_message = '{}\n\n{}'.format(
-        f'Заявки на технику {data["date"]} по состоянию на {data["current_time"]}(мск):',
-        data["full_report_text"],
-    )
+    for location, orders in data["result_by_location"].items():
+        report_lines.append(f"<b>{location}:</b>")
+        report_lines.extend(orders)
+
+    report_text = (f"<b>Заявки для {data['selected_location']} {data['date']} "
+                  f"по состоянию на {data['current_time']}(мск):</b>\n\n")
+    report_text += "\n".join(report_lines)
+
     await callback.message.answer(
-        text=final_message,
+        text=report_text,
         parse_mode='HTML',
     )
     await manager.done()

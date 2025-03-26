@@ -7,9 +7,16 @@ from aiogram.types import Message
 from dialogs.for_report.states import ReportSG
 from config.mongo_config import vehicles
 from config.bot_config import bot
+from dialogs.for_report import windows
+
 
 
 router = Router()
+dialog =  Dialog(
+    windows.main_window(),
+    windows.location_window(),
+    windows.vehicle_window(),
+)
 
 
 @router.message(Command("report"))

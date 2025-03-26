@@ -5,42 +5,31 @@ from aiogram_dialog import Dialog
 from . import getters, selected, states
 
 
-report_dialog = Dialog(
-    Window(
+async def on_exit(callback, button, dialog_manager):
+    try:
+        await dialog_manager.done()
+        await callback.message.delete()
+    except:
+        pass
+
+
+async def new_request(callback, button, dialog_manager):
+    await dialog_manager.start(Vehicle.select_location, mode=StartMode.RESET_STACK)
+
+
+def main_window():
+    return Window(
         Const("Выберите тип отчета:"),
-        Button(
-            Const("Полный отчет"),
-            id="full_report",
-            on_click=selected.on_full_report_selected,
-        ),
-        # Button(
-        #     Const("По типу техники"),
-        #     id="by_vehicle",
-        #     on_click=selected.on_vehicle_filter,  # Используем отдельную функцию
-        # ),
-        # Button(
-        #     Const("По подразделению"),
-        #     id="by_location",
-        #     on_click=selected.on_location_filter,  # Используем отдельную функцию
-        # ),
+        Button(Const("Полный отчет"), id="full_report", on_click=selected.on_full_report_selected),
+        Button(Const("По типу техники"), id="by_vehicle", on_click=selected.on_vehicle_filter),
+        Button(Const("По подразделению"), id="by_location", on_click=selected.on_location_filter),
         Cancel(Const("Закрыть")),
-        state=states.ReportSG.CHOOSE_FILTER,
-        getter=getters.get_report_data,
-    ),
-    Window(
-        Const("Выберите тип техники:"),
-        Select(
-            Format("{item[0]}"),  # Отображаемый текст
-            id="s_vehicles",
-            item_id_getter=lambda item: item[1],  # Используем второй элемент кортежа
-            items="vehicles",
-            on_click=selected.on_vehicle_selected,
-        ),
-        Back(Const("← Назад")),
-        state=states.ReportSG.BY_VEHICLE,
-        getter=getters.get_report_data,
-    ),
-    Window(
+        state=states.Report.CHOOSE_FILTER,
+        getter=getters.get_main_window_data,
+    )
+
+def location_window():
+    return Window(
         Const("Выберите подразделение:"),
         Radio(
             checked_text=Format("✓ {item}"),
@@ -51,7 +40,21 @@ report_dialog = Dialog(
             on_click=selected.on_location_selected,
         ),
         Back(Const("← Назад")),
-        state=states.ReportSG.BY_LOCATION,
-        getter=getters.get_report_data,
-    ),
-)
+        state=states.Report.BY_LOCATION,
+        getter=getters.get_location_window_data,
+    )
+
+def vehicle_window():
+    return Window(
+        Const("Выберите тип техники:"),
+        Select(
+            Format("{item[0]}"),
+            id="s_vehicles",
+            item_id_getter=lambda item: item[1],
+            items="vehicles",
+            on_click=selected.on_vehicle_selected,
+        ),
+        Back(Const("← Назад")),
+        state=states.Report.BY_VEHICLE,
+        getter=getters.get_vehicle_window_data,
+    )

@@ -13,8 +13,8 @@ async def on_exit(callback, button, dialog_manager):
         pass
 
 
-async def new_request(callback, button, dialog_manager):
-    await dialog_manager.start(Vehicle.select_location, mode=StartMode.RESET_STACK)
+# async def new_request(callback, button, dialog_manager):
+#     await dialog_manager.start(Vehicle.select_location, mode=StartMode.RESET_STACK)
 
 
 def main_window():
@@ -27,6 +27,7 @@ def main_window():
         state=states.Report.CHOOSE_FILTER,
         getter=getters.get_main_window_data,
     )
+
 
 def location_window():
     return Window(
@@ -43,6 +44,7 @@ def location_window():
         state=states.Report.BY_LOCATION,
         getter=getters.get_location_window_data,
     )
+
 
 def vehicle_window():
     return Window(

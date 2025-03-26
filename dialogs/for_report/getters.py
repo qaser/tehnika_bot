@@ -61,6 +61,11 @@ async def get_locations(dialog_manager: DialogManager, **kwargs):
     queryset = vehicles.distinct('location', {'date': date})
     # Получаем только те локации, которые есть в DISPLAYED_LOCATIONS
     locations_to_display = [loc for loc in DISPLAYED_LOCATIONS if loc in queryset]
+    # Проверяем, есть ли хотя бы одно значение из GKS_GROUP в queryset
+    gks_group_locations = [loc for loc in GKS_GROUP if loc in queryset]
+    # Если есть хотя бы одно из значений из GKS_GROUP, добавляем кнопку "ГКС"
+    if gks_group_locations:
+        locations_to_display.append('ГКС')
     return {
         'locations': [(DISPLAYED_LOCATIONS.index(v), v) for v in locations_to_display],
     }

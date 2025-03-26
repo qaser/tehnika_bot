@@ -4,7 +4,7 @@ from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram_dialog import Dialog, DialogManager, StartMode
 from aiogram.types import Message
-from dialogs.for_report.states import ReportSG
+from dialogs.for_report.states import Report
 from config.mongo_config import vehicles
 from config.bot_config import bot
 from dialogs.for_report import windows
@@ -21,7 +21,7 @@ dialog =  Dialog(
 
 @router.message(Command("report"))
 async def cmd_report(message: Message, dialog_manager: DialogManager):
-    await dialog_manager.start(ReportSG.CHOOSE_FILTER, mode=StartMode.RESET_STACK)
+    await dialog_manager.start(Report.CHOOSE_FILTER, mode=StartMode.RESET_STACK)
 
 # @router.message(Command('report'))
 # async def send_vehicle_report(message: Message):

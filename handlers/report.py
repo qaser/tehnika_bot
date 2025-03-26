@@ -16,6 +16,8 @@ dialog =  Dialog(
     windows.main_window(),
     windows.location_window(),
     windows.vehicle_window(),
+    windows.vehicle_filter_report_window(),
+    windows.location_filter_report_window(),
 )
 
 

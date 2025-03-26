@@ -1,11 +1,15 @@
 from aiogram_dialog import Window
-from aiogram_dialog.widgets.kbd import Back, Button, Cancel, Radio, Select
+from aiogram_dialog.widgets.kbd import (Back, Button, Cancel, CurrentPage,
+                                        NextPage, PrevPage, Row)
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog import Dialog
-from . import getters, selected, states
+from . import getters, selected, states, keyboards
 
 
-async def on_exit(callback, button, dialog_manager):
+REPORT_IS_EMPTY = 'Заявки на технику пока отсутствуют'
+
+
+async def exit_click(callback, button, dialog_manager):
     try:
         await dialog_manager.done()
         await callback.message.delete()
@@ -13,50 +17,76 @@ async def on_exit(callback, button, dialog_manager):
         pass
 
 
-# async def new_request(callback, button, dialog_manager):
-#     await dialog_manager.start(Vehicle.select_location, mode=StartMode.RESET_STACK)
+async def return_main_menu(callback, button, dialog_manager):
+    await dialog_manager.switch_to(states.Report.CHOOSE_FILTER)
 
 
 def main_window():
     return Window(
-        Const("Выберите тип отчета:"),
-        Button(Const("Полный отчет"), id="full_report", on_click=selected.on_full_report_selected),
-        Button(Const("По типу техники"), id="by_vehicle", on_click=selected.on_vehicle_filter),
-        Button(Const("По подразделению"), id="by_location", on_click=selected.on_location_filter),
-        Cancel(Const("Закрыть")),
+        Const('Выберите тип отчета:'),
+        Button(
+            Const('📋 Полный отчет'),
+            id='full_report',
+            on_click=selected.on_full_report_selected
+        ),
+        Button(
+            Const('🚜 По типу техники'),
+            id='by_vehicle',
+            on_click=selected.on_vehicle_filter
+        ),
+        Button(
+            Const('💼 По подразделению'),
+            id='by_location',
+            on_click=selected.on_location_filter
+        ),
+        Button(Const('🔚 Выход'), on_click=exit_click, id='exit'),
         state=states.Report.CHOOSE_FILTER,
-        getter=getters.get_main_window_data,
     )
 
 
 def location_window():
     return Window(
-        Const("Выберите подразделение:"),
-        Radio(
-            checked_text=Format("✓ {item}"),
-            unchecked_text=Format("  {item}"),
-            items="locations",
-            item_id_getter=lambda x: x,
-            id="location_radio",
-            on_click=selected.on_location_selected,
-        ),
-        Back(Const("← Назад")),
+        Const('Выберите подразделение:'),
+        keyboards.location_buttons(selected.on_location_selected),
+        Button(Const('🔙 Назад'), on_click=return_main_menu, id='main_menu'),
         state=states.Report.BY_LOCATION,
-        getter=getters.get_location_window_data,
+        getter=getters.get_locations,
     )
 
 
 def vehicle_window():
     return Window(
-        Const("Выберите тип техники:"),
-        Select(
-            Format("{item[0]}"),
-            id="s_vehicles",
-            item_id_getter=lambda item: item[1],
-            items="vehicles",
-            on_click=selected.on_vehicle_selected,
+        Const('Выберите тип техники:'),
+        keyboards.vehicle_buttons(selected.on_vehicle_selected),
+        Row(
+            PrevPage(scroll='vehicle_pager', text=Format('<')),
+            CurrentPage(scroll='vehicle_pager', text=Format('{current_page1} / {pages}')),
+            NextPage(scroll='vehicle_pager', text=Format('>')),
+            when='pager_enabled',
         ),
-        Back(Const("← Назад")),
+        Button(Const('🔙 Назад'), on_click=return_main_menu, id='main_menu'),
         state=states.Report.BY_VEHICLE,
-        getter=getters.get_vehicle_window_data,
+        getter=getters.get_vehicles,
+    )
+
+
+def vehicle_filter_report_window():
+    return Window(
+        Const(REPORT_IS_EMPTY, when='report_is_empty'),
+        Format('Заявки на технику по состоянию на {date} {current_time}(мск):\n'),
+        Format('{report}'),
+        Button(Const('🔙 Назад'), on_click=selected.on_vehicle_filter, id='vehicle_menu'),
+        state=states.Report.VEHICLE_REPORT,
+        getter=getters.get_vehicle_report,
+    )
+
+
+def location_filter_report_window():
+    return Window(
+        Const(REPORT_IS_EMPTY, when='report_is_empty'),
+        Format('Заявки на технику для "{location}" по состоянию на {date} {current_time}(мск):\n'),
+        Format('{report}'),
+        Button(Const('🔙 Назад'), on_click=selected.on_location_filter, id='location_menu'),
+        state=states.Report.LOCATION_REPORT,
+        getter=getters.get_location_report,
     )

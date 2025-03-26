@@ -58,7 +58,7 @@ def time_window():
         keyboards.time_buttons(selected.on_chosen_time),
         Back(Const('🔙 Назад')),
         state=Vehicle.select_time,
-        getter=getters.get_times
+        getter=getters.get_times,
     )
 
 

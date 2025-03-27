@@ -93,7 +93,7 @@ async def get_location_report(dialog_manager: DialogManager, **kwargs):
 
 async def get_full_report_data(dialog_manager: DialogManager, **kwargs):
     ctx = dialog_manager.current_context()
-    date_check = ctx.dialog_data['date']
+    date_check = ctx.dialog_data.get('date')
     date = date_check if date_check else dt.datetime.today().strftime('%d.%m.%Y')
     # date = dt.datetime.today().strftime('%d.%m.%Y')
     queryset = list(vehicles.find({'date': date}))

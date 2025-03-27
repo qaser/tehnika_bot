@@ -2,9 +2,8 @@ import datetime as dt
 
 from aiogram_dialog import DialogManager
 from aiogram.types import CallbackQuery
-from aiogram_dialog.widgets.kbd import Button, Radio, Select
+from aiogram_dialog.widgets.kbd import Button
 from . import getters, states
-from config.mongo_config import vehicles
 
 
 async def on_vehicle_filter(callback: CallbackQuery, button, manager: DialogManager):
@@ -37,8 +36,15 @@ async def on_full_report_selected(callback: CallbackQuery, button: Button, manag
         f'Заявки на технику {data["date"]} по состоянию на {data["current_time"]}(мск):',
         data["full_report_text"],
     )
-    await callback.message.answer(
-        text=final_message,
-        parse_mode='HTML',
-    )
+    await callback.message.answer(text=final_message)
     await manager.done()
+
+
+async def on_stats_menu(callback, button, manager):
+    await manager.switch_to(states.Report.CHOOSE_STATS_PERIOD)
+
+
+async def on_stats_report(callback, button, manager):
+    context = manager.current_context()
+    context.dialog_data.update(period=button.widget_id)
+    await manager.switch_to(states.Report.STATS_REPORT)

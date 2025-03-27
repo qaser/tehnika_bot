@@ -2,21 +2,7 @@ from aiogram_dialog import DialogManager
 import datetime as dt
 from config.mongo_config import vehicles
 from .keyboards import SCROLLING_HEIGHT
-from utils.constants import VEHICLES
-
-
-DISPLAYED_LOCATIONS = [
-    'АиМО',
-    'ГКС',
-    'ЛЭС',
-    'Связь',
-    'СЗК',
-    'ЭВС',
-    'ХМТРиСО'
-]
-
-# Группировка локаций для ГКС
-GKS_GROUP = ['ГКС', 'КЦ-1,4', 'КЦ-2,3', 'КЦ-5,6', 'КЦ-7,8', 'КЦ-9,10']
+from utils.constants import VEHICLES, DISPLAYED_LOCATIONS, GKS_GROUP
 
 
 async def get_vehicles(dialog_manager: DialogManager, **kwargs):
@@ -24,7 +10,7 @@ async def get_vehicles(dialog_manager: DialogManager, **kwargs):
     queryset = vehicles.distinct('vehicle', {'date': date})
     return {
         'vehicles': [(VEHICLES.index(v), v) for v in queryset],
-        'pager_enabled': True if len(queryset) >= SCROLLING_HEIGHT else False
+        'pager_enabled': True if len(queryset) > SCROLLING_HEIGHT else False
     }
 
 
@@ -85,23 +71,17 @@ async def get_location_report(dialog_manager: DialogManager, **kwargs):
         time = entry.get('time')
         comment = entry.get('comment', 'Без комментария')
         user = entry.get('user')
-
         if vehicle not in report_data:
             report_data[vehicle] = {}
-
         if location not in report_data[vehicle]:
             report_data[vehicle][location] = []
-
         report_data[vehicle][location].append((time.lower(), comment, user))
-
     report_text = ""
-
     for vehicle, locations_data in report_data.items():
         part_message = ''
         for loc, entries in locations_data.items():
             for time, comment, user in entries:
                 part_message += f'    <b>{loc}</b> - {time}. "{comment}" <i>({user})</i>\n'
-
         report_text += f'<u>{vehicle}</u>:\n{part_message}\n'
     return {
         'report_is_empty': True if len(queryset) == 0 else False,
@@ -144,19 +124,16 @@ async def get_full_report_data(dialog_manager: DialogManager, **kwargs):
 async def get_location_report_data(selected_location: str, dialog_manager: DialogManager):
     date = dt.datetime.today().strftime('%d.%m.%Y')
     queryset = list(vehicles.find({'date': date}))
-
     # Определяем, какие локации нужно включить в отчет
     if selected_location == 'ГКС':
         locations_to_include = GKS_GROUP
     else:
         locations_to_include = [selected_location]
-
     # Фильтруем заявки по выбранным локациям
     filtered_orders = [
         i for i in queryset
         if i.get('location') in locations_to_include
     ]
-
     # Группируем по локациям для отчета
     result_by_location = {}
     for i in filtered_orders:
@@ -165,16 +142,52 @@ async def get_location_report_data(selected_location: str, dialog_manager: Dialo
         time = i.get('time')
         comment = i.get('comment')
         user = i.get('user')
-
         if location not in result_by_location:
             result_by_location[location] = []
         result_by_location[location].append(
             f'{vehicle} - {time.lower()}. \'{comment}\' ({user})'
         )
-
     return {
         'result_by_location': result_by_location,
         'selected_location': selected_location,
         'date': date,
         'current_time': dt.datetime.today().strftime('%H:%M'),
     }
+
+
+async def get_stats_report(dialog_manager: DialogManager, **kwargs):
+    ctx = dialog_manager.current_context()
+    period = ctx.dialog_data['period']
+    now = dt.datetime.now()
+    # Определяем период для фильтрации
+    if period == 'month':
+        start_date = dt.datetime(now.year, now.month, 1)
+        period_text = f"текущий месяц ({now.strftime('%B %Y')})"
+    elif period == 'year':
+        start_date = dt.datetime(now.year, 1, 1)
+        period_text = f"текущий год ({now.year})"
+    else:  # lifetime
+        start_date = None
+        period_text = "всё время"
+    # Получаем общее количество заявок
+    query = {'datetime': {'$gte': start_date}} if start_date else {}
+    count_veh = vehicles.count_documents(query)
+    # Генерируем статистику по направлениям и технике
+    def generate_stats(group_field):
+        pipeline = [
+            {'$match': query} if start_date else {'$match': {}},
+            {'$group': {'_id': f'${group_field}', 'count': {'$sum': 1}}},
+            {'$sort': {'count': -1}}
+        ]
+        qs = vehicles.aggregate(pipeline)
+        return '\n'.join([f"{item['_id']}: <b>{item['count']}</b>" for item in qs])
+    text_location = generate_stats('location')
+    text_vehicle = generate_stats('vehicle')
+    # Формируем итоговый отчет
+    report_text = (
+        f'Статистика за {period_text}:\n'
+        f'Всего заявок: <b>{count_veh}</b>\n\n'
+        f'<u>Распределение по направлениям:</u>\n{text_location}\n\n'
+        f'<u>Распределение по виду техники:</u>\n{text_vehicle}'
+    )
+    return {'report': report_text}

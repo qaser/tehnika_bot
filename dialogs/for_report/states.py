@@ -8,3 +8,7 @@ class Report(StatesGroup):
     BY_LOCATION = State()
     LOCATION_REPORT = State()
     FULL_REPORT = State()
+    CHOOSE_STATS_PERIOD = State()
+    STATS_REPORT = State()
+    # ARCHIVE_CALENDAR = State()
+    # ARCHIVE_REPORT = State()

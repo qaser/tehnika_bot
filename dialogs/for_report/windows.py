@@ -1,6 +1,6 @@
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.kbd import (Back, Button, Cancel, CurrentPage,
-                                        NextPage, PrevPage, Row)
+                                        NextPage, PrevPage, Row, Column)
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog import Dialog
 from . import getters, selected, states, keyboards
@@ -39,6 +39,16 @@ def main_window():
             id='by_location',
             on_click=selected.on_location_filter
         ),
+        Button(
+            Const('📈 Статистика'),
+            id='stats',
+            on_click=selected.on_stats_menu
+        ),
+        # Button(
+        #     Const('📅 Архив заявок'),
+        #     id='archive',
+        #     on_click=selected.on_archive
+        # ),
         Button(Const('🔚 Выход'), on_click=exit_click, id='exit'),
         state=states.Report.CHOOSE_FILTER,
     )
@@ -89,4 +99,46 @@ def location_filter_report_window():
         Button(Const('🔙 Назад'), on_click=selected.on_location_filter, id='location_menu'),
         state=states.Report.LOCATION_REPORT,
         getter=getters.get_location_report,
+    )
+
+
+def stats_options_window():
+    return Window(
+        Const('Выберите период формирования статистики заявок:'),
+        Column(
+            Button(
+                Const('За текущий месяц'),
+                id='month',
+                on_click=selected.on_stats_report
+            ),
+            Button(
+                Const('За текущий год'),
+                id='year',
+                on_click=selected.on_stats_report
+            ),
+            Button(
+                Const('За все время'),
+                id='lifetime',
+                on_click=selected.on_stats_report
+            ),
+            Button(
+                Const('🔙 Назад'),
+                on_click=return_main_menu,
+                id='from_stats_to_main_menu',
+            ),
+        ),
+        state=states.Report.CHOOSE_STATS_PERIOD,
+    )
+
+
+def stats_report_window():
+    return Window(
+        Format('{report}'),
+        Button(
+            Const('🔙 Назад'),
+            on_click=selected.on_stats_menu,
+            id='from_stats_report_to_stats_menu'
+        ),
+        state=states.Report.STATS_REPORT,
+        getter=getters.get_stats_report,
     )

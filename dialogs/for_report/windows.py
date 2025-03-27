@@ -1,6 +1,6 @@
 from aiogram_dialog import Window
 from aiogram_dialog.widgets.kbd import (Back, Button, Cancel, CurrentPage,
-                                        NextPage, PrevPage, Row, Column)
+                                        NextPage, PrevPage, Row, Column, Calendar)
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog import Dialog
 from . import getters, selected, states, keyboards
@@ -44,11 +44,11 @@ def main_window():
             id='stats',
             on_click=selected.on_stats_menu
         ),
-        # Button(
-        #     Const('📅 Архив заявок'),
-        #     id='archive',
-        #     on_click=selected.on_archive
-        # ),
+        Button(
+            Const('📅 Архив заявок'),
+            id='archive',
+            on_click=selected.on_archive_calendar
+        ),
         Button(Const('🔚 Выход'), on_click=exit_click, id='exit'),
         state=states.Report.CHOOSE_FILTER,
     )
@@ -141,4 +141,34 @@ def stats_report_window():
         ),
         state=states.Report.STATS_REPORT,
         getter=getters.get_stats_report,
+    )
+
+
+def archive_calendar_window():
+    return Window(
+        Const('Выберите дату:'),
+        Calendar(
+            id='calendar',
+            on_click=selected.on_select_date,
+        ),
+        Button(
+            Const('🔙 Назад'),
+            on_click=return_main_menu,
+            id='from_calendar_to_main_menu'
+        ),
+        state=states.Report.ARCHIVE_CALENDAR,
+    )
+
+
+def archive_report_window():
+    return Window(
+        Format('Заявки на технику на {date}:\n'),
+        Format('{full_report_text}'),
+        Button(
+            Const('🔙 Назад'),
+            on_click=selected.on_archive_calendar,
+            id='from_archive_report_to_calendar'
+        ),
+        state=states.Report.ARCHIVE_REPORT,
+        getter=getters.get_full_report_data,
     )

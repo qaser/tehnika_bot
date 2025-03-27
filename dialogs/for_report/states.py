@@ -10,5 +10,5 @@ class Report(StatesGroup):
     FULL_REPORT = State()
     CHOOSE_STATS_PERIOD = State()
     STATS_REPORT = State()
-    # ARCHIVE_CALENDAR = State()
-    # ARCHIVE_REPORT = State()
+    ARCHIVE_CALENDAR = State()
+    ARCHIVE_REPORT = State()

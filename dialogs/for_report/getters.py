@@ -92,7 +92,10 @@ async def get_location_report(dialog_manager: DialogManager, **kwargs):
 
 
 async def get_full_report_data(dialog_manager: DialogManager, **kwargs):
-    date = dt.datetime.today().strftime('%d.%m.%Y')
+    ctx = dialog_manager.current_context()
+    date_check = ctx.dialog_data['date']
+    date = date_check if date_check else dt.datetime.today().strftime('%d.%m.%Y')
+    # date = dt.datetime.today().strftime('%d.%m.%Y')
     queryset = list(vehicles.find({'date': date}))
     full_report_data = {}
     for i in queryset:
@@ -162,13 +165,13 @@ async def get_stats_report(dialog_manager: DialogManager, **kwargs):
     # Определяем период для фильтрации
     if period == 'month':
         start_date = dt.datetime(now.year, now.month, 1)
-        period_text = f"текущий месяц ({now.strftime('%B %Y')})"
+        period_text = f'текущий месяц'
     elif period == 'year':
         start_date = dt.datetime(now.year, 1, 1)
-        period_text = f"текущий год ({now.year})"
+        period_text = f'{now.year} год'
     else:  # lifetime
         start_date = None
-        period_text = "всё время"
+        period_text = 'всё время'
     # Получаем общее количество заявок
     query = {'datetime': {'$gte': start_date}} if start_date else {}
     count_veh = vehicles.count_documents(query)

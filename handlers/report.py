@@ -15,8 +15,8 @@ dialog =  Dialog(
     windows.location_filter_report_window(),
     windows.stats_options_window(),
     windows.stats_report_window(),
-    # windows.archive_calendar_window(),
-    # windows.archive_report_window(),
+    windows.archive_calendar_window(),
+    windows.archive_report_window(),
 )
 
 

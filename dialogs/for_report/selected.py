@@ -48,3 +48,14 @@ async def on_stats_report(callback, button, manager):
     context = manager.current_context()
     context.dialog_data.update(period=button.widget_id)
     await manager.switch_to(states.Report.STATS_REPORT)
+
+
+async def on_archive_calendar(callback, button, manager):
+    await manager.switch_to(states.Report.ARCHIVE_CALENDAR)
+
+
+async def on_select_date(callback, widget, manager, clicked_date):
+    context = manager.current_context()
+    date = clicked_date.strftime('%d.%m.%Y')
+    context.dialog_data.update(date=date)
+    await manager.switch_to(states.Report.ARCHIVE_REPORT)

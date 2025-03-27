@@ -116,6 +116,7 @@ async def get_full_report_data(dialog_manager: DialogManager, **kwargs):
             part_message = '{}{}'.format(part_message, text)
         vehicle_part_text = '<u>{}</u>:\n{}'.format(vehicle, part_message)
         full_report_text = '{}{}\n'.format(full_report_text, vehicle_part_text)
+    del ctx.dialog_data['date']
     return {
         'full_report_text': full_report_text,
         'date': date,

@@ -10,7 +10,7 @@ mongo_client = AsyncIOMotorClient("mongodb://localhost:27017")
 
 storage = MongoStorage(
     client=mongo_client,
-    db_name="aiogram_fsm",
+    db_name="tehnika_bot_db",
     collection_name="states",
     key_builder=DefaultKeyBuilder(with_destiny=True),
 )

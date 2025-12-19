@@ -11,33 +11,33 @@ from utils.constants import TIME_ZONE
 
 
 async def main():
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(
-        send_vehicle_notify,
-        'cron',
-        day_of_week='mon-thu',
-        hour=15,
-        minute=0,
-        timezone=TIME_ZONE
-    )
-    # напоминание о заказе техники в "пятницу"
-    scheduler.add_job(
-        send_vehicle_notify,
-        'cron',
-        day_of_week='fri',
-        hour=11,
-        minute=30,
-        timezone=TIME_ZONE
-    )
-    scheduler.add_job(
-        send_vehicle_month_resume,
-        'cron',
-        day='1',
-        hour=10,
-        minute=0,
-        timezone=TIME_ZONE
-    )
-    scheduler.start()
+    # scheduler = AsyncIOScheduler()
+    # scheduler.add_job(
+    #     send_vehicle_notify,
+    #     'cron',
+    #     day_of_week='mon-thu',
+    #     hour=15,
+    #     minute=0,
+    #     timezone=TIME_ZONE
+    # )
+    # # напоминание о заказе техники в "пятницу"
+    # scheduler.add_job(
+    #     send_vehicle_notify,
+    #     'cron',
+    #     day_of_week='fri',
+    #     hour=11,
+    #     minute=30,
+    #     timezone=TIME_ZONE
+    # )
+    # scheduler.add_job(
+    #     send_vehicle_month_resume,
+    #     'cron',
+    #     day='1',
+    #     hour=10,
+    #     minute=0,
+    #     timezone=TIME_ZONE
+    # )
+    # scheduler.start()
     dp.include_routers(
         service.router,
         vehicle.router,
